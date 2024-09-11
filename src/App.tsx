@@ -8,6 +8,7 @@ import { ethers } from 'ethers';
 import 'react-toastify/dist/ReactToastify.css';
 import Info from './components/Info.jsx';
 import Mint from './components/Mint';
+
 import {
   BrowserRouter as Router,
   Route,
@@ -28,7 +29,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import React from 'react';
-
+import FetchNFTs from './components/FetchNFTs';
 
 const App: FC = () => {
   return (
@@ -66,7 +67,8 @@ const Content: FC = () => {
       <Nav/>
       <Routes>
         <Route path="/" element={<Home/>}></Route>
-        <Route path="/all-nft" element={<NFTs marketplace={marketplace} setNFTitem={setNFTitem} />}></Route>
+        {/* <Route path="/all-nft" element={<NFTs marketplace={marketplace} setNFTitem={setNFTitem} />}></Route> */}
+        <Route path="/all-nft" element={<FetchNFTs />}></Route>
         <Route path="/create" element={<Mint />}></Route>
         <Route path="/info" element={<Info nftitem={nftitem} />}></Route>
       </Routes>

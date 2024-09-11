@@ -12,22 +12,16 @@ import { toast } from "react-toastify";
 
 const Mint: React.FC = () => {
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState<any | null>(0);
-  const [rooms, setRooms] = useState<any | null>(0);
-  const [bathrooms, setBathrooms] = useState<any | null>(0);
-  const [parking, setParking] = useState<any | null>(0);
-  const [area, setArea] = useState<any | null>(0);
-  const [image, setImage] = useState<any | null>(null);
+  const [video, setVideo] = useState<any | null>(null);
   const [uri, setUri] = useState<string>("");
   const [stateInitialized, setStateInitialized] = useState<boolean>(false);
   const [mintAccount, setMintAccount] = useState<any | null>("");
-  const [associatedTokenAccount, setAssociatedTokenAccount] = useState<
-    any | null
-  >("");
+  const [associatedTokenAccount, setAssociatedTokenAccount] = useState<any | null>("");
   const [currentProvider, setCurrentProvider] = useState<any | null>("");
   const [stateAccount, setStateAccount] = useState<web3.PublicKey>(
-    new web3.PublicKey("9Vj7E3HAc3bcVHz2ZB3J3vTT4DGirdQ7eHawhde1fRUZ")
+    new web3.PublicKey("Fm5oC7TkuwKtT7tAdA8KNR4DFcohpKLnpaxt4NmjBGDV")
   ); //checking
   // const REACT_APP_PINATA_JWT = process.env.REACT_APP_PINATA_JWT;
   const REACT_APP_PINATA_JWT =
@@ -43,7 +37,7 @@ const Mint: React.FC = () => {
         // console.log("state account: ", stateAccountPublicKey.toString());
 
         const stateAccountPublicKey = new web3.PublicKey(
-          "9Vj7E3HAc3bcVHz2ZB3J3vTT4DGirdQ7eHawhde1fRUZ"
+          "Fm5oC7TkuwKtT7tAdA8KNR4DFcohpKLnpaxt4NmjBGDV"
         );
         console.log(stateAccountPublicKey);
         setStateAccount(stateAccountPublicKey);
@@ -63,9 +57,23 @@ const Mint: React.FC = () => {
     checkInitialization();
   }, []);
 
-  const handleFileChange = (event: any) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
-    setImage(event.target.files[0]);
+    setVideo(event.target.files[0]);
+    // const file = event.target.files?.[0]; // Get the first file if it exists
+    // if (!file) return;
+    // const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    // if (allowedTypes.includes(file.type)) {
+    //   // Handle the video file (e.g., set it to state or process it)
+    //   setVideo(file);
+    // } else {
+    //   // Inform the user that the file is not a video
+    //   toast.info("Please select a valid video file. (Accepted types: 'video/mp4', 'video/webm', 'video/ogg')", {
+    //     position: "top-center"
+    //   });
+    //   // Optionally, clear the input
+    //   event.target.value = ''; // Reset the file input
+    // }
   };
 
   const initializeState = async () => {
@@ -109,7 +117,7 @@ const Mint: React.FC = () => {
         .getCounter()
         .accounts({
           state: new web3.PublicKey(
-            "9Vj7E3HAc3bcVHz2ZB3J3vTT4DGirdQ7eHawhde1fRUZ"
+            "Fm5oC7TkuwKtT7tAdA8KNR4DFcohpKLnpaxt4NmjBGDV"
           ),
           signer: provider.publicKey,
         })
@@ -152,7 +160,7 @@ const Mint: React.FC = () => {
 
       // Upload image to IPFS
       const formData = new FormData();
-      formData.append("file", image);
+      formData.append("file", video);
       const options = JSON.stringify({
         cidVersion: 0,
       });
@@ -184,33 +192,10 @@ const Mint: React.FC = () => {
         pinataContent: {
           name: name,
           symbol: name.toUpperCase(),
-          description: "Real Estate NFT",
+          description: description,
+          price: price,
           image: tokenImageUri,
           attributes: [
-            {
-              trait_type: "numberOfRooms",
-              value: rooms,
-            },
-            {
-              trait_type: "numberOfBathrooms",
-              value: bathrooms,
-            },
-            {
-              trait_type: "numberOfParking",
-              value: parking,
-            },
-            {
-              trait_type: "propertyAreaInSqft",
-              value: area,
-            },
-            {
-              trait_type: "address",
-              value: address,
-            },
-            {
-              trait_type: "price",
-              value: price,
-            },
             {
               trait_type: "mintAccount",
               value: mintAccountPublicKey.toBase58(),
@@ -378,46 +363,25 @@ const Mint: React.FC = () => {
           <form className="max-w-sm mx-auto">
 
             <div className='max-w-lg mx-auto'>
-              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="user_avatar">Upload Image</label>
+              <label className="block mb-2 text-sm font-medium text-white" htmlFor="user_avatar">Upload Video</label>
               <input onChange={(e) => {handleFileChange(e)}} name="file" className="block w-full mb-4 h-8 text-m  text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file" />
             </div>
 
 
             <div className="mb-4">
-              <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+              <label htmlFor="title" className="block mb-2 text-sm font-medium text-white">Name</label>
               <input onChange={(e) => setName(e.target.value)} type="text" id="title" name='title' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Name" required />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-              <input onChange={(e) => setAddress(e.target.value)} type="text" id="address" name='title' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Address" required />
+              <label htmlFor="description" className="block mb-2 text-sm font-medium text-white">Description</label>
+              <input onChange={(e) => setDescription(e.target.value)} type="text" id="description" name='description' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Description" required />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+              <label htmlFor="price" className="block mb-2 text-sm font-medium text-white">Price</label>
               <input onChange={(e) => setPrice(e.target.value)} type="number" id="price" name='price' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Price" />
             </div>
-
-            <div className="mb-4">
-              <label htmlFor="rooms" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rooms</label>
-              <input onChange={(e) => setRooms(e.target.value)} type="number" id="rooms" name='price' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Rooms" />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="bathrooms" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bathrooms</label>
-              <input onChange={(e) => setBathrooms(e.target.value)} type="number" id="bathrooms" name='price' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Bathrooms" />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="parking" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Parking</label>
-              <input onChange={(e) => setParking(e.target.value)} type="number" id="parking" name='price' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Parking capacity" />
-            </div>
-            
-            <div className="mb-4">
-              <label htmlFor="area" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Area</label>
-              <input onChange={(e) => setArea(e.target.value)} type="number" id="area" name='price' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Area" />
-            </div>
-
             
             <div className='text-center'>
               <button onClick={mintNft} className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" >

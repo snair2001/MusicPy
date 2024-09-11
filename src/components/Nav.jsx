@@ -21,9 +21,9 @@ function Nav() {
           <Link className='no-underline text-gray-200' as={Link} to="/">
           <li>Home</li>   </Link>
           <Link className='no-underline text-gray-200' as={Link} to="/all-nft">
-          <li>All SBT</li>   </Link>
+          <li>All NFTs</li>   </Link>
           <Link className='no-underline text-gray-200' as={Link} to="/create">
-          <li>Mint SBT</li>   </Link>
+          <li>Mint NFT</li>   </Link>
         </ul>
         
         <div class="hidden xl:flex items-center space-x-5 items-center">
