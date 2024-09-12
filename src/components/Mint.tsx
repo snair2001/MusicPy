@@ -9,6 +9,8 @@ import {
 } from "@solana/spl-token";
 import { getProvider } from "../detectProvider";
 import { toast } from "react-toastify";
+import contractData from '../contracts/contractData.json'
+
 
 const Mint: React.FC = () => {
   const [name, setName] = useState("");
@@ -21,7 +23,7 @@ const Mint: React.FC = () => {
   const [associatedTokenAccount, setAssociatedTokenAccount] = useState<any | null>("");
   const [currentProvider, setCurrentProvider] = useState<any | null>("");
   const [stateAccount, setStateAccount] = useState<web3.PublicKey>(
-    new web3.PublicKey("Fm5oC7TkuwKtT7tAdA8KNR4DFcohpKLnpaxt4NmjBGDV")
+    new web3.PublicKey(contractData.STATE)
   ); //checking
   // const REACT_APP_PINATA_JWT = process.env.REACT_APP_PINATA_JWT;
   const REACT_APP_PINATA_JWT =
@@ -36,9 +38,7 @@ const Mint: React.FC = () => {
         // );
         // console.log("state account: ", stateAccountPublicKey.toString());
 
-        const stateAccountPublicKey = new web3.PublicKey(
-          "Fm5oC7TkuwKtT7tAdA8KNR4DFcohpKLnpaxt4NmjBGDV"
-        );
+        const stateAccountPublicKey = new web3.PublicKey(contractData.STATE);
         console.log(stateAccountPublicKey);
         setStateAccount(stateAccountPublicKey);
 
@@ -82,7 +82,7 @@ const Mint: React.FC = () => {
         .initialize()
         .accounts({
           state: new web3.PublicKey(
-            "9Vj7E3HAc3bcVHz2ZB3J3vTT4DGirdQ7eHawhde1fRUZ" // state account derived from solana pg, not by seeds in code
+            contractData.STATE // state account derived from solana pg, not by seeds in code
           ),
           signer: provider.wallet.publicKey,
           systemProgram: web3.SystemProgram.programId,
@@ -98,6 +98,16 @@ const Mint: React.FC = () => {
 
   const mintNft = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    console.log("mint func");
+    if(name === "" || price === 0 || description === "" || video === null){
+      console.log("cannot mint");
+      
+      toast.info("Cannot mint due to one or multiple empty fields", {position: "top-center"})
+      alert("Cannot mint due to one or multiple empty fields")
+      return
+    }
+    console.log("passed the if");
+    
 
     // check if state is initialized, if not, do it
     if (!stateInitialized) {
@@ -116,9 +126,7 @@ const Mint: React.FC = () => {
       const currentCounter = await program.methods
         .getCounter()
         .accounts({
-          state: new web3.PublicKey(
-            "Fm5oC7TkuwKtT7tAdA8KNR4DFcohpKLnpaxt4NmjBGDV"
-          ),
+          state: new web3.PublicKey(contractData.STATE),
           signer: provider.publicKey,
         })
         .view();
@@ -183,7 +191,8 @@ const Mint: React.FC = () => {
       console.log(res);
       const resDataJson = await res.json();
       console.log("res json: ", resDataJson);
-      const tokenImageUri = `https://gold-quick-antelope-719.mypinata.cloud/ipfs/${resDataJson.IpfsHash}`;
+      // const tokenImageUri = `https://gold-quick-antelope-719.mypinata.cloud/ipfs/${resDataJson.IpfsHash}`;
+      const tokenImageUri = `https://ipfs.io/ipfs/${resDataJson.IpfsHash}`;
       console.log(tokenImageUri);
       console.log("NFT image saved to IPFS! Creating metadata...");
 
@@ -191,26 +200,11 @@ const Mint: React.FC = () => {
       const data = JSON.stringify({
         pinataContent: {
           name: name,
+          owner: currentProvider,
           symbol: name.toUpperCase(),
           description: description,
           price: price,
           image: tokenImageUri,
-          attributes: [
-            {
-              trait_type: "mintAccount",
-              value: mintAccountPublicKey.toBase58(),
-            },
-            {
-              trait_type: "mintAuthority",
-              value: currentProvider,
-            },
-            {
-              trait_type: "associatedTokenAccount",
-              value: ata.toBase58(),
-            },
-          ],
-          properties: {},
-          collection: {},
         },
         pinataMetadata: {
           name: "Metadata.json",
@@ -255,6 +249,7 @@ const Mint: React.FC = () => {
         toast.success("minted NFT successfully", {
           position: "top-center"
         });
+        alert("minted NFT successfully")
       // alert("NFT minted successfully");
     } catch (error) {
       console.log(error);
@@ -363,7 +358,7 @@ const Mint: React.FC = () => {
           <form className="max-w-sm mx-auto">
 
             <div className='max-w-lg mx-auto'>
-              <label className="block mb-2 text-sm font-medium text-white" htmlFor="user_avatar">Upload Video</label>
+              <label className="block mb-2 text-sm font-medium text-white" htmlFor="user_avatar">Upload Image</label>
               <input onChange={(e) => {handleFileChange(e)}} name="file" className="block w-full mb-4 h-8 text-m  text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file" />
             </div>
 

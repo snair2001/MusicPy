@@ -25,7 +25,7 @@
 
 .card-div{
   width: 250px; 
-  height: 340px;
+  height: auto;
   transition: all 0.2s;
   position: relative;
   cursor: pointer;
