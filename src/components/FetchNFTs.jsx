@@ -86,7 +86,8 @@ function FetchNFTs({ setNftitem }) {
 
         setNftData(data);
         console.log(nftData)
-        console.log(setNftsLoaded(true));
+        setNftsLoaded(true)
+        console.log(nftsLoaded);
         setError(false)
 
       } catch (error) {

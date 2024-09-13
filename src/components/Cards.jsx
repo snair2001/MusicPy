@@ -106,7 +106,12 @@ function Cards({ item, setNftitem, setVideoSrc, owner, player, setPlayer }) {
     <div className='card-container'>
       <div className='card-div'>
         <div className='card-inner p-2'>
-          <img src={PYUSD} alt="" className='object-cover w-[230px] h-[230px] rounded overflow-hidden' />
+          {item?.thumbnail ? (
+            // {if }
+            <img src={item.thumbnail} alt={item.name} className='object-cover w-[230px] h-[230px] rounded overflow-hidden' />
+          ):(
+            <img src={PYUSD} alt={item.name} className='object-cover w-[230px] h-[230px] rounded overflow-hidden' />
+          )}
           <div className='card-content'>
             <h1 className='text-white text-3xl mt-3'><strong>{item.name}</strong></h1>
             <h4 className='text-white mx-2 mt-2'>{item.description}</h4>

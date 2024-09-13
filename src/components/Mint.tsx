@@ -9,14 +9,14 @@ import {
 } from "@solana/spl-token";
 import { getProvider } from "../detectProvider";
 import { toast } from "react-toastify";
-import contractData from '../contracts/contractData.json'
-
+import contractData from "../contracts/contractData.json";
 
 const Mint: React.FC = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<any | null>(0);
   const [video, setVideo] = useState<any | null>(null);
+  const [thumbnail, setThumbnail] = useState<any | null>(null);
   const [uri, setUri] = useState<string>("");
   const [stateInitialized, setStateInitialized] = useState<boolean>(false);
   const [mintAccount, setMintAccount] = useState<any | null>("");
@@ -57,22 +57,62 @@ const Mint: React.FC = () => {
     checkInitialization();
   }, []);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     // if (!event.target.files) return;
     // setVideo(event.target.files[0]);
     const file = event.target.files?.[0]; // Get the first file if it exists
     if (!file) return;
-    const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    const allowedTypes = ["video/mp4", "video/webm", "video/ogg"];
     if (allowedTypes.includes(file.type)) {
-      // Handle the video file (e.g., set it to state or process it)
       setVideo(file);
-    } else {
-      // Inform the user that the file is not a video
-      toast.info("Please select a valid video file. (Accepted types: 'video/mp4', 'video/webm', 'video/ogg')", {
-        position: "top-center"
+      // Create a video element
+      const videoElement = document.createElement('video');
+      videoElement.preload = 'metadata';
+
+      // Load the video file into the video element
+      const url = URL.createObjectURL(file);
+      videoElement.src = url;
+
+      videoElement.addEventListener('loadeddata', () => {
+        // Once video data is loaded, capture the first frame
+        videoElement.currentTime = 0; // Go to the start of the video
+
+        videoElement.addEventListener('seeked', async () => {
+          // Create a canvas element to draw the frame
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          if (!context) return;
+
+          canvas.width = videoElement.videoWidth;
+          canvas.height = videoElement.videoHeight;
+
+          // Draw the first frame of the video onto the canvas
+          context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+          // Convert canvas to data URL
+          const dataURL = canvas.toDataURL('image/jpeg');
+          const blob = await (await fetch(dataURL)).blob();
+          setThumbnail(blob); // Set the thumbnail state
+          console.log(blob);
+          console.log(thumbnail);
+          console.log(typeof(blob));
+          
+          // Clean up
+          URL.revokeObjectURL(url);
+        });
       });
-      // Optionally, clear the input
-      event.target.value = ''; // Reset the file input
+
+    } else {
+      toast.info(
+        <div>
+          <p>Please select a valid video file. </p>
+          <p>(Accepted types: 'video/mp4', 'video/webm', 'video/ogg')</p>
+        </div>,
+        {
+          position: "top-center",
+        }
+      );
+      event.target.value = ""; // Reset the file input
     }
   };
 
@@ -101,18 +141,19 @@ const Mint: React.FC = () => {
     console.log("mint func");
     if(name === "" || price === 0 || description === "" || video === null){
       console.log("cannot mint");
-      
-      toast.info("Cannot mint due to one or multiple empty fields", {position: "top-center"})
-      alert("Cannot mint due to one or multiple empty fields")
-      return
+
+      toast.info("Cannot mint due to one or multiple empty fields", {
+        position: "top-center"
+      });
+      // alert("Cannot mint due to one or multiple empty fields");
+      return;
     }
     console.log("passed the if");
-    
 
     // check if state is initialized, if not, do it
     if (!stateInitialized) {
       toast.info("State is not initialized. Initializing the state first.", {
-        position: "top-center"
+        position: "top-center",
       });
       await initializeState();
       return;
@@ -166,7 +207,10 @@ const Mint: React.FC = () => {
       );
       setAssociatedTokenAccount(ata.toBase58());
 
-      // Upload image to IPFS
+      toast.info("Uploading video to IPFS", {
+        position:"top-center"
+      })
+      // Upload video to IPFS
       const formData = new FormData();
       formData.append("file", video);
       const options = JSON.stringify({
@@ -177,7 +221,7 @@ const Mint: React.FC = () => {
         name: name,
       });
       formData.append("pinataMetadata", metadata);
-
+      
       const res = await fetch(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
         {
@@ -194,8 +238,51 @@ const Mint: React.FC = () => {
       // const tokenImageUri = `https://gold-quick-antelope-719.mypinata.cloud/ipfs/${resDataJson.IpfsHash}`;
       const tokenImageUri = `https://ipfs.io/ipfs/${resDataJson.IpfsHash}`;
       console.log(tokenImageUri);
-      console.log("NFT image saved to IPFS! Creating metadata...");
+      console.log("NFT video saved to IPFS!");
+      toast.info(
+      <div>
+        <p>Video saved to IPFS!</p>
+        <p>Uploading thumbnail to IPFS</p>
+      </div>, {
+        position:"top-center"
+      })
+      
+      // thumbnail
+      const formData2 = new FormData();
+      formData2.append("file", thumbnail);
+      const options2 = JSON.stringify({
+        cidVersion: 0,
+      });
+      formData2.append("pinataOptions", options2);
+      const metadata2 = JSON.stringify({
+        name: name,
+      });
+      formData2.append("pinataMetadata", metadata2);
 
+      const res1 = await fetch(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${REACT_APP_PINATA_JWT}`,
+          },
+          body: formData2,
+        }
+      );
+      console.log(res1);
+      const resDataJson2 = await res1.json();
+      console.log("res1 json: ", resDataJson2);
+      const thumbnailUri = `https://cyan-magnetic-rat-616.mypinata.cloud/ipfs/${resDataJson2.IpfsHash}`;
+      console.log(thumbnailUri);
+      console.log("NFT thumbnail saved to IPFS! Creating metadata...");
+      
+      toast.info(<div>
+        <p>Thumbnail saved to IPFS!</p>
+        <p>Now pinning metadata to IPFS</p>
+      </div>, {
+        position:"top-center"
+      })
+      
       // create metadata
       const data = JSON.stringify({
         pinataContent: {
@@ -205,12 +292,13 @@ const Mint: React.FC = () => {
           description: description,
           price: price,
           image: tokenImageUri,
+          thumbnail: thumbnailUri,
         },
         pinataMetadata: {
           name: "Metadata.json",
         },
       });
-
+      
       // send metadata to IPFS
       const res2 = await fetch(
         "https://api.pinata.cloud/pinning/pinJSONToIPFS",
@@ -226,7 +314,14 @@ const Mint: React.FC = () => {
       const resData2 = await res2.json();
       setUri(resData2.IpfsHash); // change here made
       console.log("NFT metadata saved to IPFS!");
-
+      toast.info(
+      <div>
+        <p>NFT metadata saved to IPFS!</p>
+        <p>Now minting NFT on blockchain</p>
+      </div>, {
+        position:"top-center"
+      })
+      
       const tx = await program.methods
         .initNft(resData2.IpfsHash) //change here made
         .accounts({
@@ -241,15 +336,14 @@ const Mint: React.FC = () => {
         })
         .rpc();
 
-        
-        console.log("InItNFT tx signature: ", tx);
-        
-        console.log("mintAccountPublicKey: ", mintAccount);
-        console.log("ata: ", associatedTokenAccount);
-        toast.success("minted NFT successfully", {
-          position: "top-center"
-        });
-        alert("minted NFT successfully")
+      console.log("InItNFT tx signature: ", tx);
+
+      console.log("mintAccountPublicKey: ", mintAccount);
+      console.log("ata: ", associatedTokenAccount);
+      toast.success("Minted NFT successfully", {
+        position: "top-center",
+      });
+      // alert("minted NFT successfully");
       // alert("NFT minted successfully");
     } catch (error) {
       console.log(error);
@@ -257,135 +351,94 @@ const Mint: React.FC = () => {
   };
 
   return (
-    // <>
-    //   <h1>Mint your NFT</h1>
-    //   {/* <form onSubmit={mintNft}> */}
-    //   <label>
-    //     Name:
-    //     <input
-    //       type="text"
-    //       value={name}
-    //       onChange={(e) => setName(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Address:
-    //     <input
-    //       type="text"
-    //       value={address}
-    //       onChange={(e) => setAddress(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Price:
-    //     <input
-    //       type="number"
-    //       value={price}
-    //       onChange={(e) => setPrice(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Rooms:
-    //     <input
-    //       type="number"
-    //       value={rooms}
-    //       onChange={(e) => setRooms(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Bathrooms:
-    //     <input
-    //       type="number"
-    //       value={bathrooms}
-    //       onChange={(e) => setBathrooms(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Parking:
-    //     <input
-    //       type="number"
-    //       value={parking}
-    //       onChange={(e) => setParking(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Area:
-    //     <input
-    //       type="number"
-    //       value={area}
-    //       onChange={(e) => setArea(e.target.value)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <label>
-    //     Image:
-    //     <input
-    //       type="file"
-    //       accept="image/*"
-    //       onChange={(e) => handleFileChange(e)}
-    //       required
-    //     />
-    //   </label>
-    //   <br />
-    //   <br />
-    //   <button onClick={mintNft}>MINT</button>
-    //   {/* </form> */}
-    // </>
-    <div className='max-h-screen pt-24'>
+    <div className="max-h-screen pt-24">
       <div className="container-fluid mt-5 text-left">
         <div className="content mx-auto">
-
           <form className="max-w-sm mx-auto">
-
-            <div className='max-w-lg mx-auto'>
-              <label className="block mb-2 text-sm font-medium text-white" htmlFor="user_avatar">Upload Video</label>
-              <input onChange={(e) => {handleFileChange(e)}} name="file" className="block w-full mb-4 h-8 text-m  text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file" accept="video/*" />
+            <div className="max-w-lg mx-auto">
+              <label
+                className="block mb-2 text-sm font-medium text-white"
+                htmlFor="user_avatar"
+              >
+                Upload Video
+              </label>
+              <input
+                onChange={(e) => {
+                  handleFileChange(e);
+                }}
+                name="file"
+                className="block w-full mb-4 h-8 text-m  text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                type="file"
+                accept="video/*"
+              />
             </div>
-
 
             <div className="mb-4">
-              <label htmlFor="title" className="block mb-2 text-sm font-medium text-white">Name</label>
-              <input onChange={(e) => setName(e.target.value)} type="text" id="title" name='title' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Name" required />
+              <label
+                htmlFor="title"
+                className="block mb-2 text-sm font-medium text-white"
+              >
+                Name
+              </label>
+              <input
+                onChange={(e) => setName(e.target.value)}
+                type="text"
+                id="title"
+                name="title"
+                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                placeholder="Enter Name"
+                required
+              />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="description" className="block mb-2 text-sm font-medium text-white">Description</label>
-              <input onChange={(e) => setDescription(e.target.value)} type="text" id="description" name='description' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Describe the NFT (max limit: 20 characters)" required maxLength={20}/>
+              <label
+                htmlFor="description"
+                className="block mb-2 text-sm font-medium text-white"
+              >
+                Description
+              </label>
+              <input
+                onChange={(e) => setDescription(e.target.value)}
+                type="text"
+                id="description"
+                name="description"
+                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                placeholder="Describe the NFT (max limit: 20 characters)"
+                required
+                maxLength={20}
+              />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="price" className="block mb-2 text-sm font-medium text-white">Price</label>
-              <input onChange={(e) => setPrice(e.target.value)} type="number" id="price" name='price' className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Enter Price in PYUSD" />
+              <label
+                htmlFor="price"
+                className="block mb-2 text-sm font-medium text-white"
+              >
+                Price
+              </label>
+              <input
+                onChange={(e) => setPrice(e.target.value)}
+                type="number"
+                id="price"
+                name="price"
+                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                placeholder="Enter Price in PYUSD"
+              />
             </div>
-            
-            <div className='text-center'>
-              <button onClick={mintNft} className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" >
+
+            <div className="text-center">
+              <button
+                onClick={mintNft}
+                className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              >
                 Mint SBT
               </button>
             </div>
           </form>
         </div>
       </div>
+      {/* {thumbnail && <img src={thumbnail} alt="Video Thumbnail" />} */}
     </div>
   );
 };
