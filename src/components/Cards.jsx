@@ -110,7 +110,7 @@ function Cards({ item, setNftitem, setVideoSrc, owner, player, setPlayer }) {
           <h1 className='text-white text-3xl mt-3'><strong>{item.name}</strong></h1>
           <h4 className='text-white mx-2 mt-2'>{item.description}</h4>
           {/* <h5 className='text-white mt-1'><span className='text-green-400'><strong>{item.price} </strong></span> PYUSD</h5> */}
-          <h5 className='text-white mt-3'><span className='text-green-400'><strong>{item.price} </strong></span><img src={PYUSDIcon} alt="PYUSD Icon" className='w-6 h-6 inline-block align-bottom' /></h5>
+          <h5 className='text-white mt-3'>Price: <span className='text-green-400'><strong>{item.price} </strong></span><img src={PYUSDIcon} alt="PYUSD Icon" className='w-6 h-6 inline-block align-bottom' /></h5>
           {/* {console.log("item: ",item.data)} */}
           <div className='flex text-white justify-between items-center mb-3 gap-4 mt-3'>
             {/* <Link as={Link} to="/info"> */}
