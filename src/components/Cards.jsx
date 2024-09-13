@@ -11,6 +11,7 @@ import { Keypair } from '@solana/web3.js';
 import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { createTransferCheckedInstruction } from '@solana/spl-token';
 import PYUSD from '../assets/PYUSD.png'
+import PYUSDIcon from '../assets/PYUSD-icon.png'
 
 function Cards({ item, setNftitem, setVideoSrc, owner, player, setPlayer }) {
   const { publicKey, signTransaction } = useWallet();
@@ -106,8 +107,10 @@ function Cards({ item, setNftitem, setVideoSrc, owner, player, setPlayer }) {
       <div className='card-inner p-2'>
         <img src={PYUSD} alt="" className='object-cover w-[230px] h-[230px] rounded overflow-hidden' />
         <div className='flex flex-col justify-center items-center'>
-          <h3 className='text-white text-2xl font-thin mt-3'>{item.name}</h3>
-          <h4 className='text-white text-2xl font-thin mt-3'>{item.price} PYUSD</h4>
+          <h1 className='text-white text-3xl mt-3'><strong>{item.name}</strong></h1>
+          <h4 className='text-white mx-2 mt-2'>{item.description}</h4>
+          {/* <h5 className='text-white mt-1'><span className='text-green-400'><strong>{item.price} </strong></span> PYUSD</h5> */}
+          <h5 className='text-white mt-3'><span className='text-green-400'><strong>{item.price} </strong></span><img src={PYUSDIcon} alt="PYUSD Icon" className='w-6 h-6 inline-block align-bottom' /></h5>
           {/* {console.log("item: ",item.data)} */}
           <div className='flex text-white justify-between items-center mb-3 gap-4 mt-3'>
             {/* <Link as={Link} to="/info"> */}
