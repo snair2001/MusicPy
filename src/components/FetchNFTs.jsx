@@ -80,7 +80,7 @@ function FetchNFTs({ setNftitem }) {
             state: nftStatesResponse[index],
           })
         );
-        console.log(data);
+        console.log('data: ', data);
 
         setNftData(data);
         console.log(nftData)
@@ -123,7 +123,7 @@ function FetchNFTs({ setNftitem }) {
           {
             (nftData.length > 0 ?
               nftData.map((item, idx) => (
-                <Cards item={item.data} setNftitem={setNftitem} index={idx} />
+                <Cards item={item.data} owner = {item.owner} setNftitem={setNftitem} index={idx} />
               ))
               : (
                 <main style={{ padding: "1rem 0" }}>

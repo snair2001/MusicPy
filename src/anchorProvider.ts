@@ -20,4 +20,4 @@ setProvider(provider);
 
 const program = new Program(idl as Idl, provider);
 
-export { provider, program };
+export {connection, provider, program };

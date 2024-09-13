@@ -1,19 +1,95 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { Link } from 'react-router-dom';
 import '../App.css';
+import { provider, connection } from '../anchorProvider';
+import { Transaction, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { createMint, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { createTransferInstruction, getOrCreateAssociatedTokenAccount } from '@solana/spl-token';
+import { sendAndConfirmTransaction } from '@solana/web3.js';
+import { Keypair } from '@solana/web3.js';
+import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
+import { createTransferCheckedInstruction } from '@solana/spl-token';
 
-function Cards({ item, setNftitem, index }) {
-  if (item!== undefined){
+function Cards({ item, setNftitem, index, owner }) {
+  const { publicKey, signTransaction } = useWallet();
 
-
-    async function handlePayment(nftItem) {
-      try {
-        
-      } catch (error) {
-        
-      }
+  async function handlePayment() {
+    if (!publicKey || !signTransaction) {
+      console.log('Wallet not connected');
+      return;
     }
-
+  
+    const recipientPublicKey = new PublicKey(owner); 
+    const tokenMintPublicKey = new PublicKey('CXk2AMBfi3TwaEL2468s6zP8xq9NxTXjp9gjMgzeUynM'); 
+    const lamports = parseInt(item.price) * 1000000;
+  
+    const tokenProgramId = TOKEN_2022_PROGRAM_ID; 
+  
+    try {
+      const senderTokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        publicKey,
+        tokenMintPublicKey,
+        publicKey,
+        true,
+        "finalized",
+        { commitment: "finalized" },
+        tokenProgramId,
+      );
+      console.log("sender token account: ", senderTokenAccount);
+  
+      const recipientTokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        publicKey,
+        tokenMintPublicKey,
+        recipientPublicKey,
+        true,
+        "finalized",
+        { commitment: "finalized" },
+        tokenProgramId,
+      );
+      console.log("recipient token account: ", recipientTokenAccount);
+  
+      const decimals = 6;
+      const transferInstruction = createTransferCheckedInstruction(
+        senderTokenAccount.address,
+        tokenMintPublicKey,
+        recipientTokenAccount.address,
+        publicKey,
+        lamports,
+        decimals,
+        [],
+        tokenProgramId 
+      );
+  
+      console.log('Transaction instruction: ', transferInstruction);
+  
+      const transaction = new Transaction().add(transferInstruction);
+      transaction.feePayer = publicKey;
+      transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+      console.log('transaction: ', transaction);
+  
+      const signedTransaction = await signTransaction(transaction);
+      console.log('signed transaction: ', signedTransaction);
+  
+      try {
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+        console.log("Transaction successful, signature:", signature);
+      } catch (error) {
+        console.error('Transaction failed:', error);
+        if (error.logs) {
+          console.log('Transaction logs:', error.logs);
+        }
+        alert("Transaction failed");
+      }
+      
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      alert("Transaction failed");
+    }
+  }
+  
 
     return (
       <div className='card-div'>
@@ -25,7 +101,7 @@ function Cards({ item, setNftitem, index }) {
             {/* {console.log("item: ",item.data)} */}
             <div className='flex text-white justify-between items-center mb-3 gap-4 mt-3'>
               {/* <Link as={Link} to="/info"> */}
-                <button type="button" class="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded text-sm px-5 py-1.5 text-center me-2 " onClick={() => {setNftitem(item)}}>View</button>
+                <button type="button" class="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded text-sm px-5 py-1.5 text-center me-2 " onClick={() => {handlePayment()}}>View</button>
               {/* </Link>  */}
               {/* :
                 <button type="button" class="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded text-sm px-5 py-1.5 text-center me-2 ">Open</button> */}  
@@ -36,9 +112,5 @@ function Cards({ item, setNftitem, index }) {
       </div>
     )
   }
-  return (
-    <></>
-  )
-}
 
 export default Cards
