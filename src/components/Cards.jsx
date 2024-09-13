@@ -103,26 +103,22 @@ function Cards({ item, setNftitem, setVideoSrc, owner, player, setPlayer }) {
 
 
   return (
-    <div className='card-div'>
-      <div className='card-inner p-2'>
-        <img src={PYUSD} alt="" className='object-cover w-[230px] h-[230px] rounded overflow-hidden' />
-        <div className='flex flex-col justify-center items-center'>
-          <h1 className='text-white text-3xl mt-3'><strong>{item.name}</strong></h1>
-          <h4 className='text-white mx-2 mt-2'>{item.description}</h4>
-          {/* <h5 className='text-white mt-1'><span className='text-green-400'><strong>{item.price} </strong></span> PYUSD</h5> */}
-          <h5 className='text-white mt-3'>Price: <span className='text-green-400'><strong>{item.price} </strong></span><img src={PYUSDIcon} alt="PYUSD Icon" className='w-6 h-6 inline-block align-bottom' /></h5>
-          {/* {console.log("item: ",item.data)} */}
-          <div className='flex text-white justify-between items-center mb-3 gap-4 mt-3'>
-            {/* <Link as={Link} to="/info"> */}
-            {!player && <button type="button" class="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded text-sm px-5 py-1.5 text-center me-2 " onClick={() => { handlePayment() }}>Watch</button>}
-            {/* </Link>  */}
-            {/* :
-                <button type="button" class="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded text-sm px-5 py-1.5 text-center me-2 ">Open</button> */}
+    <div className='card-container'>
+      <div className='card-div'>
+        <div className='card-inner p-2'>
+          <img src={PYUSD} alt="" className='object-cover w-[230px] h-[230px] rounded overflow-hidden' />
+          <div className='card-content'>
+            <h1 className='text-white text-3xl mt-3'><strong>{item.name}</strong></h1>
+            <h4 className='text-white mx-2 mt-2'>{item.description}</h4>
+          </div>
+          <div className='card-footer'>
+            <h5 className='text-white mt-2'>Price: <span className='text-green-400'><strong>{item.price} </strong></span><img src={PYUSDIcon} alt="PYUSD Icon" className='w-6 h-6 inline-block align-bottom' /></h5>
+            {!player && <button type="button" className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded text-sm px-5 py-1.5 text-center me-2 mt-4" onClick={() => { handlePayment() }}>Watch</button>}
           </div>
         </div>
-
       </div>
     </div>
+
   )
 }
 

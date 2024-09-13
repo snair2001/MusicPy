@@ -2,11 +2,9 @@ import "./App.css";
 import Nav from "./components/Nav.jsx";
 import { ToastContainer } from "react-toastify";
 import Home from "./components/Home.jsx";
-import NFTs from "./components/NFTs.jsx";
 import { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.css";
-import Info from "./components/Info.jsx";
 import Mint from "./components/Mint";
 
 import {
@@ -72,10 +70,6 @@ const Content: FC = () => {
                 element={<FetchNFTs setNftitem={setNftitem} />}
               ></Route>
               <Route path="/create" element={<Mint />}></Route>
-              <Route
-                path="/info"
-                element={<Info nftitem={nftitem} setNftitem={setNftitem} />}
-              ></Route>
             </Routes>
           </div>
         </div>

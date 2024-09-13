@@ -104,7 +104,7 @@ function FetchNFTs({ setNftitem }) {
         <h2 className='text-white font-bold pt-24 text-2xl text-center'>Loading...</h2>
       )}
       {error && (
-        <h2 className='text-red-500 font-bold pt-24 text-2xl text-center'>Error fetching NFTs</h2>
+        <h2 className='text-red-500 font-bold pt-24 text-2xl text-center'>Error fetching NFTs... Have you connected your wallet?</h2>
       )}
       {nftsLoaded && (
         <div className='flex flex-wrap gradient-bg-welcome   gap-10 justify-center pt-24 pb-5 px-16'>
