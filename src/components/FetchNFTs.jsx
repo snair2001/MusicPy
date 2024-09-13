@@ -17,6 +17,8 @@ function FetchNFTs({ setNftitem }) {
   const [nftsLoaded, setNftsLoaded] = useState(false)
   const [currNft, setCurrNft] = useState(null);
   const [player, setPlayer] = useState(false);
+  const [videoSrc, setVideoSrc] = useState("")
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     const getNftDetails = async () => {
@@ -85,9 +87,12 @@ function FetchNFTs({ setNftitem }) {
         setNftData(data);
         console.log(nftData)
         console.log(setNftsLoaded(true));
+        setError(false)
 
       } catch (error) {
         console.error("Error fetching NFT data:", error);
+        setNftsLoaded(true)
+        setError(true)
       }
     };
 
@@ -95,37 +100,40 @@ function FetchNFTs({ setNftitem }) {
   }, []);
   return (
     <>
-      {nftsLoaded && player && (
-        // <div className='flex flex-wrap gradient-bg-welcome   gap-10 justify-center pt-24 pb-5 px-16'>
-
-        // </div>
-        <div style={{
-          width: '650px',
-          height: 'auto',
-          // backgroundColor: "#ddd",
-          margin: '0 auto',
-          display: 'block',
-          // justifyContent:'center'
-        }}>
-          {/* <PlayerCard item={currNft} player={player}/> */}
-          <div className='audio-outer'>
-            <div className='audio-inner'>
-              <PlayerCard item={currNft} player={player} setPlayer={setPlayer} setCurrNft={setCurrNft} currNft={currNft} />
-            </div>
-          </div>
-        </div>
-      )}
       {!nftsLoaded && (
         <h2 className='text-white font-bold pt-24 text-2xl text-center'>Loading...</h2>
       )}
+      {error && (
+        <h2 className='text-red-500 font-bold pt-24 text-2xl text-center'>Error fetching NFTs</h2>
+      )}
       {nftsLoaded && (
         <div className='flex flex-wrap gradient-bg-welcome   gap-10 justify-center pt-24 pb-5 px-16'>
-          {
+          {player && (
+            // <div className='flex flex-wrap gradient-bg-welcome   gap-10 justify-center pt-24 pb-5 px-16'>
+
+            // </div>
+            <div style={{
+              width: '650px',
+              height: 'auto',
+              // backgroundColor: "#ddd",
+              margin: '0 auto',
+              display: 'block',
+              // justifyContent:'center'
+            }}>
+              {/* <PlayerCard item={currNft} player={player}/> */}
+              <div className='audio-outer'>
+                <div className='audio-inner'>
+                  <PlayerCard item={currNft} player={player} setPlayer={setPlayer} setCurrNft={setCurrNft} currNft={currNft} videoSrc={videoSrc} setVideoSrc={setVideoSrc}/>
+                </div>
+              </div>
+            </div>
+          )}
+          { !error && 
             (nftData.length > 0 ?
               nftData.map((item, idx) => (
-                <Cards item={item.data} owner = {item.owner} setNftitem={setNftitem} index={idx} />
+                <Cards item={item.data} owner={item.owner} setNftitem={setCurrNft} index={idx} player={player} setPlayer={setPlayer} setVideoSrc={setVideoSrc} />
               ))
-              : (
+              :(
                 <main style={{ padding: "1rem 0" }}>
                   <h2 className='text-white'>No listed assets</h2>
                 </main>

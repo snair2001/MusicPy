@@ -1,14 +1,9 @@
-import React, { useState } from 'react'
-import Fluid from "../assets/Fluid.png"
-import Flower from "../assets/Flower.png"
-import Ethereum from "../assets/Ethereum.svg"
-import { ethers } from 'ethers'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 import '../App.css';
 
 
 
-function PlayerCard({ item, player, setPlayer, setCurrNft, currNft }) {
+function PlayerCard({ item, player, setPlayer, setCurrNft, currNft, videoSrc, setVideoSrc }) {
 
   function close() {
     player = false;
@@ -18,16 +13,32 @@ function PlayerCard({ item, player, setPlayer, setCurrNft, currNft }) {
     currNft = null;
     console.log("player: ", player);
     console.log("curr nft: ", currNft);
+    setVideoSrc("")
+    console.log("video Src: ", videoSrc);
+    
   }
+  // const [videoSrc, setVideoSrc] = useState("")
+  // useEffect(() => {
+  //   console.log(item.image);
+  //   const ipfsPrefix = 'https://ipfs.io/ipfs/';
+  //   const hash = item.image.substring(ipfsPrefix.length);
+  //   const url = "https://cyan-magnetic-rat-616.mypinata.cloud/ipfs/" + hash;
+  //   console.log("url: ", url);
+  //   setVideoSrc(url);
+    
+  // })
 
   return (
     <>
+      {console.log("entered playercard")}
+      {console.log(item, player, currNft)}
       {player && item && <div>
         <div className='audio-div' style={{ height: "auto", width: "auto" }}>
           <div className='audio-inner p-2'>
             <div className='flex flex-col justify-center items-center'>
               <video width="auto" height="400" controls autoPlay>
-                <source src={item.file} type="video/ogg" />
+                <source src={videoSrc} type="video/ogg" />
+                {console.log(videoSrc)}
               </video>
               <h3 className='text-white text-2xl font-thin mt-3'>{item.name}</h3>
               <div className='flex text-white justify-between items-center mb-3 gap-4 mt-3'>

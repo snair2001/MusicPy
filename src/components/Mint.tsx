@@ -58,22 +58,22 @@ const Mint: React.FC = () => {
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-    setVideo(event.target.files[0]);
-    // const file = event.target.files?.[0]; // Get the first file if it exists
-    // if (!file) return;
-    // const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
-    // if (allowedTypes.includes(file.type)) {
-    //   // Handle the video file (e.g., set it to state or process it)
-    //   setVideo(file);
-    // } else {
-    //   // Inform the user that the file is not a video
-    //   toast.info("Please select a valid video file. (Accepted types: 'video/mp4', 'video/webm', 'video/ogg')", {
-    //     position: "top-center"
-    //   });
-    //   // Optionally, clear the input
-    //   event.target.value = ''; // Reset the file input
-    // }
+    // if (!event.target.files) return;
+    // setVideo(event.target.files[0]);
+    const file = event.target.files?.[0]; // Get the first file if it exists
+    if (!file) return;
+    const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    if (allowedTypes.includes(file.type)) {
+      // Handle the video file (e.g., set it to state or process it)
+      setVideo(file);
+    } else {
+      // Inform the user that the file is not a video
+      toast.info("Please select a valid video file. (Accepted types: 'video/mp4', 'video/webm', 'video/ogg')", {
+        position: "top-center"
+      });
+      // Optionally, clear the input
+      event.target.value = ''; // Reset the file input
+    }
   };
 
   const initializeState = async () => {
@@ -358,7 +358,7 @@ const Mint: React.FC = () => {
           <form className="max-w-sm mx-auto">
 
             <div className='max-w-lg mx-auto'>
-              <label className="block mb-2 text-sm font-medium text-white" htmlFor="user_avatar">Upload Image</label>
+              <label className="block mb-2 text-sm font-medium text-white" htmlFor="user_avatar">Upload Video</label>
               <input onChange={(e) => {handleFileChange(e)}} name="file" className="block w-full mb-4 h-8 text-m  text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file" />
             </div>
 
