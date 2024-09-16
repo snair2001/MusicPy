@@ -1,6 +1,6 @@
 # Video NFT Marketplace on Solana
 
-This is a Video NFT Marketplace Dapp built on solana blockchain. Here, the fess for watching the video is paid using PYUSD
+This is a Video NFT Marketplace Dapp built on Solana blockchain where the fee for watching the video is paid using PYUSD
 
 Hosted app link: [https://video-nft-marketplace-solana.netlify.app/](https://video-nft-marketplace-solana.netlify.app/)
 
@@ -27,7 +27,7 @@ Hosted app link: [https://video-nft-marketplace-solana.netlify.app/](https://vid
   * The smart contract was written in [Rust](https://doc.rust-lang.org/stable/book/) and deployed using [Anchor framework](https://www.anchor-lang.com/) and deployed on the Solana Devnet.
   * We have made use of the [Phantom Wallet](https://phantom.app/). The SOL devnet test tokens were obtained from [Solana Faucet](https://faucet.solana.com/) and PYUSD test tokens were obtained from [PYUSD Faucet](https://faucet.paxos.com/). 
 * ### Deployment
-  *  The smart contract was deployed on the devnet from the cli, so the steps to setup the deployment environment are [here](https://www.anchor-lang.com/docs/installation)
+  *  The smart contract was deployed on the devnet from the cli. The steps to setup the deployment environment are [here](https://www.anchor-lang.com/docs/installation)
     *  Initialize a new project using the command:
         ```sh
         anchor init <your-app-name>
@@ -50,7 +50,7 @@ Hosted app link: [https://video-nft-marketplace-solana.netlify.app/](https://vid
         // With this
         idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
         ```
-    *  In the `./programs/anchor/src/lib.rs` file, paste the code from `src/contracts/smartcontract.rs` file from my repository except the line-
+    *  In the `./programs/anchor/src/lib.rs` file, paste the code from `src/contracts/smartcontract.rs` file from this repository except the line-
        ```rust
        declare_id!("8VUfy12GD5yhKAcb7zdkAmjGyiMZVq5ce2zMNyi31Bra");
        ```
