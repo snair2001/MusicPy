@@ -50,6 +50,10 @@ Hosted app link: [https://video-nft-marketplace-solana.netlify.app/](https://vid
         // With this
         idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
         ```
+    *  In the `./programs/anchor/src/lib.rs` file, paste the code from `src/contracts/smartcontract.rs` file from my repository except the line-
+       ```rust
+       declare_id!("8VUfy12GD5yhKAcb7zdkAmjGyiMZVq5ce2zMNyi31Bra");
+       ```
     *  Now run the commands
         ```sh
         anchor build

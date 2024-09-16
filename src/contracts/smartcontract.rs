@@ -62,12 +62,6 @@ pub mod solana_nft_anchor {
         Ok(state.metadata_uri.clone())
     }
 
-    pub fn get_nft_pending_owners(ctx: Context<GetCounter>) -> Result<Vec<[u8; 32]>> {
-        let state = &ctx.accounts.state;
-        // Return pending owners list
-        Ok(vec![]) // Adjust based on your logic
-    }
-
     pub fn get_counter(ctx: Context<GetCounter>) -> Result<u32> {
         let state = &ctx.accounts.state;
         Ok(state.counter)
